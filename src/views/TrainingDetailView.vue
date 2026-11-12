@@ -1,4 +1,8 @@
 <script setup>
+const actualSets = ref(3)
+const actualReps = ref(12)
+const rpe = ref(7)
+
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { exercises } from '../data/exercises.js'
@@ -14,8 +18,26 @@ const exercise = computed(() =>
 
 function completeTraining() {
   if (!exercise.value) return
+  
+  if (
+    !Number.isInteger(actualSets.value) ||
+    actualSets.value < 1 ||
+    !Number.isInteger(actualReps.value) ||
+    actualReps.value < 1 ||
+    !Number.isInteger(rpe.value) ||
+    rpe.value < 1 ||
+    rpe.value > 10
+  ) {
+    alert('세트 수, 반복 횟수, 운동 강도를 올바르게 입력해 주세요.')
+    return
+  }
 
-  saveTrainingRecord(exercise.value)
+  saveTrainingRecord(exercise.value, {
+    actualSets: actualSets.value,
+    actualReps: actualReps.value,
+    rpe: rpe.value,
+  })
+
   isSaved.value = true
 }
 
@@ -102,6 +124,60 @@ const difficultyNames = {
       <h2>주의사항</h2>
       <p>{{ exercise.precautions }}</p>
     </section>
+
+    <div class="training-log">
+      <h2>오늘의 훈련 기록</h2>
+
+      <p class="training-log-description">
+        실제로 수행한 운동량을 입력해 주세요.
+      </p>
+
+      <div class="training-input-group">
+        <label for="actual-sets">실제 수행 세트</label>
+
+        <input
+          id="actual-sets"
+          v-model.number="actualSets"
+          type="number"
+          min="1"
+          max="100"
+        />
+      </div>
+
+      <div class="training-input-group">
+        <label for="actual-reps">세트당 반복 횟수</label>
+
+        <input
+          id="actual-reps"
+          v-model.number="actualReps"
+          type="number"
+          min="1"
+          max="1000"
+        />
+      </div>
+
+      <div class="training-input-group">
+        <label for="training-rpe">
+          운동 강도 (RPE)
+          <strong>{{ rpe }} / 10</strong>
+        </label>
+
+        <input
+          id="training-rpe"
+          v-model.number="rpe"
+          type="range"
+          min="1"
+          max="10"
+          step="1"
+        />
+
+        <div class="rpe-labels">
+          <span>매우 쉬움</span>
+          <span>매우 힘듦</span>
+        </div>
+      </div>
+    </div>
+
     
     <button
         class="complete-button"
@@ -336,4 +412,82 @@ const difficultyNames = {
   color: #b8f36b;
   cursor: default;
 }
+
+
+.training-log {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #293243;
+  border-radius: 13px;
+  background: #131a27;
+}
+
+.training-log h2 {
+  margin: 0 0 8px;
+  color: #f3f5f9;
+  font-size: 18px;
+}
+
+.training-log-description {
+  margin-bottom: 24px;
+  color: #98a3b5;
+  font-size: 13px;
+}
+
+.training-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.training-input-group:last-child {
+  margin-bottom: 0;
+}
+
+.training-input-group label {
+  display: flex;
+  justify-content: space-between;
+  color: #c3cede;
+  font-size: 13px;
+}
+
+.training-input-group label strong {
+  color: #b8f36b;
+}
+
+.training-input-group input[type="number"] {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #354054;
+  border-radius: 8px;
+  outline: none;
+  background: #0c111b;
+  color: #f3f5f9;
+  font-size: 15px;
+}
+
+.training-input-group input:focus {
+  border-color: #b8f36b;
+}
+
+.training-input-group input[type="range"] {
+  width: 100%;
+  accent-color: #b8f36b;
+  cursor: pointer;
+}
+
+.rpe-labels {
+  display: flex;
+  justify-content: space-between;
+  color: #98a3b5;
+  font-size: 11px;
+}
+
+@media (max-width: 480px) {
+  .training-log {
+    padding: 16px;
+  }
+}
+
 </style>

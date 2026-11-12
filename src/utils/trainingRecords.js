@@ -11,27 +11,41 @@ export function getTrainingRecords() {
 }
 
 // 훈련 기록 저장하기
-export function saveTrainingRecord(exercise) {
+
+export function saveTrainingRecord(exercise, actualData = {}) {
   const records = getTrainingRecords()
 
   const newRecord = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+
     exerciseId: exercise.id,
     exerciseName: exercise.name,
     position: exercise.position,
     category: exercise.category,
     duration: exercise.duration,
+
+    // 기존 운동 권장 정보
     sets: exercise.sets,
     reps: exercise.reps,
+
+    // 사용자가 실제로 수행한 운동 기록
+    actualSets: actualData.actualSets ?? null,
+    actualReps: actualData.actualReps ?? null,
+    rpe: actualData.rpe ?? null,
+
     completedAt: new Date().toISOString(),
   }
 
   records.unshift(newRecord)
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(records)
+  )
 
   return newRecord
 }
+
 
 // 기록 삭제하기
 export function deleteTrainingRecord(id) {
